@@ -1,5 +1,9 @@
 <div class="container">
   <div class="row">
-    <app-message [message]="message"></app-message>
+    <app-message
+      [message]="message"
+      (editClicked)="message.content = $event"
+      *ngFor="let message of messages"
+    ></app-message>
   </div>
 </div>
