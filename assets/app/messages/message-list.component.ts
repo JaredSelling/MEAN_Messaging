@@ -5,10 +5,10 @@ import { MessageService } from './message.service';
 @Component({
   selector: 'app-message-list',
   templateUrl: `
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-8 col-md-of
+    fset-2">
       <app-message
         [message]="message"
-        (editClicked)="message.content = $event"
         *ngFor="let message of messages"
       ></app-message>
     </div>
