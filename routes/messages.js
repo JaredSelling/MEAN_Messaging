@@ -8,6 +8,7 @@ var Message = require('../models/message');
 
 router.get('/', function(req, res, next) {
   Message.find()
+    .populate('user', 'firstName')
     .exec(function(err, messages) {
       if(err) {
         return res.status(500).json({
@@ -24,10 +25,10 @@ router.get('/', function(req, res, next) {
 
 router.use('/', function(req, res, next) {
     jwt.verify(req.query.token, 'secret', function(error, decoded) {
-        if(err) {
+        if(error) {
             return res.status(401).json({
                 title: 'Not authenticated',
-                error: err
+                error: error
             });
         }
         next();
@@ -63,6 +64,7 @@ router.post('/', function(req, res, next) {
 });
 
 router.patch('/:id', function(req, res, next) {
+    var decoded = jwt.decode(req.query.token);
     Message.findById(req.params.id, function(err, message) {
         if(err) {
           return res.status(500).json({
@@ -74,6 +76,12 @@ router.patch('/:id', function(req, res, next) {
             return res.status(500).json({
                 message: 'No message found',
                 error: {message: 'Message not found'}
+            });
+        }
+        if(message.user != decoded.user._id) {
+            return res.status(401).json({
+                title: 'Not authenticated',
+                error: {message: 'Users do not match'}
             });
         }
         message.content = req.body.content;
@@ -95,6 +103,7 @@ router.patch('/:id', function(req, res, next) {
 });
 
 router.delete('/:id', function(req, res, next) {
+    var decoded = jwt.decode(req.query.token);
     Message.findById(req.params.id, function(err, message) {
         if(err) {
           return res.status(500).json({
@@ -106,6 +115,12 @@ router.delete('/:id', function(req, res, next) {
             return res.status(500).json({
                 message: 'No message found',
                 error: {message: 'Message not found'}
+            });
+        }
+        if(message.user != decoded.user._id) {
+            return res.status(401).json({
+                title: 'Not authenticated',
+                error: {message: 'Users do not match'}
             });
         }
         message.remove(function(err, result) {
