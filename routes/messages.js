@@ -92,8 +92,6 @@ router.patch('/:id', function(req, res, next) {
                     error: err
                 });
             }
-            user.messages.push(result);
-            user.save();
             res.status(200).json({
                 message: 'Updated message',
                 obj: result
