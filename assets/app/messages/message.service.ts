@@ -3,13 +3,14 @@ import { Http, Response, Headers } from '@angular/http';
 import { Injectable, EventEmitter } from '@angular/core';
 import 'rxjs/Rx';
 import { Observable } from 'rxjs';
+import { ErrorService } from '../errors/error.service';
 
 @Injectable()
 export class MessageService {
   private messages: Message[] = [];
   messageIsEdit = new EventEmitter<Message>();
 
-  constructor(private http: Http) {}
+  constructor(private http: Http, private errorService: ErrorService) {}
 
   addMessage(message: Message) {
     const body = JSON.stringify(message);
@@ -24,7 +25,10 @@ export class MessageService {
         this.messages.push(message);
         return message;
       })
-      .catch((error: Response) => Observable.throw(error.json()));
+      .catch((error: Response) =>  {
+          this.errorService.handleError(error.json());
+          return Observable.throw(error.json());
+      });
   }
 
   getMessages() {
@@ -38,7 +42,10 @@ export class MessageService {
         this.messages = transformedMessages;
         return transformedMessages;
       })
-      .catch((error: Response) => Observable.throw(error.json()));
+      .catch((error: Response) =>  {
+          this.errorService.handleError(error.json());
+          return Observable.throw(error.json());
+      });
 
   }
 
@@ -54,7 +61,10 @@ export class MessageService {
         : '';
     return this.http.patch('http://localhost:3000/message/'+message.messageId + token, body, {headers: headers})//does not send request, only an observable
       .map((response: Response) => response.json())
-      .catch((error: Response) => Observable.throw(error.json()));
+      .catch((error: Response) =>  {
+          this.errorService.handleError(error.json());
+          return Observable.throw(error.json());
+      });
   }
 
   deleteMessage(message: Message) {
@@ -64,6 +74,9 @@ export class MessageService {
         : '';
     return this.http.delete('http://localhost:3000/message/'+message.messageId + token)//does not send request, only an observable
       .map((response: Response) => response.json())
-      .catch((error: Response) => Observable.throw(error.json()));
+      .catch((error: Response) =>  {
+          this.errorService.handleError(error.json());
+          return Observable.throw(error.json());
+      });
   }
 }
